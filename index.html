@@ -36,8 +36,8 @@
         <section class="container">
             <a href="http://balanceof.me/"><h1 class="title">balanceof.me</h1></a>
             <ul class="navigation-list right">
-                <!-- <li class="navigation-item"><a class="navigation-link" href="#" data-popover="">WETH</a></li>
-                <li class="navigation-item"><a class="navigation-link" href="#" data-popover="">Donate</a></li> -->
+                <!-- <li class="navigation-item"><a class="navigation-link" href="#" data-popover="">WETH</a></li> -->
+                <li class="navigation-item"><a class="navigation-link" href="#" data-popover="" onclick="handleDonate()">Donate</a></li>
             </ul>
         </section>
     </nav>
@@ -87,11 +87,11 @@
       <!-- Modal content -->
       <div class="modal-content">
         <span class="close" onclick="App.closeAllModals()">&times;</span>
-        <h3> Withdraw </h3>
+        <h3> Withdraw <span id="name"></span></h3>
         <hr />
         <div class="move-tokens">
-          <input type="number" value="0"></input><span>max</span><button class="button button-outline">withdraw</button>
-          <input type="range" min="1" max="100" value="0" class="slider" id="balanceRange"></input>
+          <input type="number" value="0" id="amountInput"></input><span id="max">max</span><button class="button button-outline">withdraw</button>
+          <input type="range" min="0.0" max="1.0" step="0.01" value="0" class="slider" id="balanceRange"></input>
         </div>
       </div>
     </div>
@@ -100,11 +100,11 @@
       <!-- Modal content -->
       <div class="modal-content">
         <span class="close" onclick="App.closeAllModals()">&times;</span>
-        <h3> Deposit </h3>
+        <h3> Deposit <span id="name"></span></h3>
         <hr />
         <div class="move-tokens">
-          <input type="number" value="0"></input><span>max</span><button class="button button-outline">deposit</button>
-          <input type="range" min="1" max="100" value="0" class="slider" id="balanceRange"></input>
+          <input type="number" value="0" id="amountInput"></input><span id="max">max</span><button class="button button-outline">deposit</button>
+          <input type="range" min="0.0" max="1.0" step="0.01" value="0" class="slider" id="balanceRange"></input>
         </div>
       </div>
     </div>
@@ -113,16 +113,37 @@
       <!-- Modal content -->
       <div class="modal-content">
         <span class="close" onclick="App.closeAllModals()">&times;</span>
-        <h3> Transfer </h3>
+        <h3> Transfer <span id="name"></span></h3>
         <hr />
         <div class="move-tokens">
           <input type="text" placeholder="0x...."></input>
-          <input type="number" value="0"></input><span>max</span><button class="button button-outline">transfer</button>
-          <input type="range" min="1" max="100" value="0" class="slider" id="balanceRange"></input>
+          <input type="number" value="0" id="amountInput"></input><span id="max">max</span><button class="button button-outline">transfer</button>
+          <input type="range" min="0.0" max="1.0" step="0.01" value="0" class="slider" id="balanceRange"></input>
         </div>
       </div>
     </div>
+    <div id="donateModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close" onclick="App.closeAllModals()">&times;</span>
+        <h3> Donate</h3>
+        <hr />
+        <p>
+             If you like my work and you want to say thanks, you can do it on <a href="https://twitter.com/MR_R0BEK" title="MrR" target="_blank">Twitter</a> or you can buy me a beer by sending some ether or tokens to my account:
+        </p>
+        <pre><code>
+            0xAf8CA985092f6f93F068CD8CcBc81E5fd0474047
+        </pre></code>
 
+        <p>
+            Thanks :)<br/>
+            Robert
+        </br/>
+
+        </p>
+
+      </div>
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="./js/bignumber.min.js"></script>

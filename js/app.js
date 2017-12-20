@@ -21,8 +21,15 @@ function getEtherdeltaTradeAnchor(token) {
         return "ETH";
     return `<a href='https://etherdelta.com/#${token.name}-ETH' title="https://etherdelta.com/#${token.name}-ETH" target="_blank">${token.name}</a>`;
 }
+
+function createDropdownLink(title, amount, token) {
+    return `<a href="#" id="${title}-${token.addr}" class="button button-outline" ${amount.greaterThan(0) ? "" : "disabled"}>${title}</a>`
+}
+function createDropdownContent(wallet, etherdelta, token) {
+    return `<div class="dropdown-content">${createDropdownLink("deposit", wallet, token)}${createDropdownLink("withdraw", etherdelta, token)}<hr />${createDropdownLink("transfer", wallet, token)}</div>`
+}
 function getRowMenu(wallet, etherdelta, token) {
-  return `<div class="dropdown"><button class="button button-outline"> &plus; </button><div class="dropdown-content"><a href="#" id=withdraw${token.addr} class="button button-outline">withdraw</a><a href="#" id=deposit${token.addr} class="button button-outline">deposit</a><hr/><a href="#" id=transfer${token.addr} class="button button-outline">transfer</a></div></div>`;
+  return `<div class="dropdown"><button class="button button-outline"> &plus; </button>${createDropdownContent(wallet, etherdelta, token)}</div>`;
 }
 
 function onProgress(current, total) {
@@ -37,21 +44,18 @@ function onTokenFound(wallet, etherdelta, token) {
   var name = token.name;
   var markup = `<tr><td>${getEtherdeltaTradeAnchor(token)}</td><td>${escape(total)}</td><td>${escape(walletbalance)}</td><td>${escape(edbalance)}</td><td>${getRowMenu(wallet, etherdelta, token)}</td></tr>`;
   $("table tbody").append(markup);
-  $("#deposit"+token.addr).on("click", (ev) => {
-    ev.preventDefault();
-    if (walletbalance !== "0")
-      App.showDepositModal(wallet, token);
+  $("table tbody").on("click", `#deposit-${token.addr}`, (ev) => {
+      ev.preventDefault();
+      wallet.greaterThan(0) && App.showDepositModal(wallet, token);
   });
-  $("#withdraw"+token.addr).on("click", (ev) => {
-    ev.preventDefault();
-    if (edbalance !== "0")
-      App.showWithdrawModal(etherdelta, token);
-  });
-  $("#transfer"+token.addr).on("click", (ev) => {
-    ev.preventDefault();
-    if (walletbalance !== "0")
-      App.showTransferModal(wallet, token);
-  });
+  $("table tbody").on("click", `#withdraw-${token.addr}`, (ev) => {
+      ev.preventDefault();
+      etherdelta.greaterThan(0) && App.showWithdrawModal(etherdelta, token);
+  })
+  $("table tbody").on("click", `#transfer-${token.addr}`, (ev) => {
+      ev.preventDefault();
+      wallet.greaterThan(0) && App.showTransferModal(wallet, token);
+  })
 }
 
 function isEth(addr) {
@@ -172,12 +176,13 @@ var App = {
       depositModal: $("#depositModal"),
       transferModal: $("#transferModal"),
       withdrawModal: $("#withdrawModal"),
+      donateModal: $("#donateModal")
     }
   },
 
   initModal: () => {
     window.onclick = () => {
-      let modals = [App.page.depositModal[0], App.page.withdrawModal[0], App.page.transferModal[0]];
+      let modals = [App.page.depositModal[0], App.page.withdrawModal[0], App.page.transferModal[0], App.page.donateModal[0]];
       if (modals.filter( m => m == event.target).length) {
         // there should be only one active modal so closing all does not change much ...
         App.closeAllModals()
@@ -189,18 +194,53 @@ var App = {
     App.page.depositModal.css("display", "none");
     App.page.transferModal.css("display", "none");
     App.page.withdrawModal.css("display", "none");
+    App.page.donateModal.css("display", "none");
   },
 
   showDepositModal(available, token) {
-    App.page.depositModal.css("display", "block");
+    this.resetAndShowModal(App.page.depositModal, available, token);
   },
 
   showTransferModal(available, token) {
-    App.page.transferModal.css("display", "block");
+    this.resetAndShowModal(App.page.transferModal, available, token);
   },
 
   showWithdrawModal(available, token) {
-    App.page.withdrawModal.css("display", "block");
+    var modal = App.page.withdrawModal;
+    modal.find("button").off("click").on("click", ev => {
+        ev.preventDefault;
+        // toBigNumber(modal.find("input#amountInput").val());
+    })
+    this.resetAndShowModal(modal, available, token);
+
+  },
+
+  resetAndShowModal(modal, available, token) {
+      // this one is useful with doing the ratio on slider
+      var prettyBnAvailable = new BigNumber(formatAmount(available.toString(10), token.decimals));
+      var name = modal.find("span#name");
+      name.text(escape(token.name));
+
+      var amountInput = modal.find("input#amountInput");
+      amountInput.val(0);
+      amountInput.off("input").on("input", () => {
+          var amount = new BigNumber(amountInput.val());
+          balanceRange.val(amount.dividedBy(prettyBnAvailable));
+      })
+      var balanceRange = modal.find("input#balanceRange");
+      balanceRange.val(0);
+      balanceRange.off("input").on("input", () => {
+          var part = available.times(balanceRange.val()).floor();
+          var part_str = formatAmount(part.toString(10), token.decimals);
+          amountInput.val(part_str);
+      });
+
+      var max = modal.find("span#max");
+      max.off("click").on("click", () => {
+          amountInput.val(formatAmount(available.toString(10), token.decimals));
+          amountInput.trigger("input");
+      });
+      modal.css("display", "block");
   },
 
   initTickersInput: () => {
@@ -257,7 +297,7 @@ var App = {
           balances = await fetchTokenBalance(token, user());
         }
         onProgress(i+1, tokens.length);
-        var broke = balances[0].toString() === "0" && balances[1].toString() === "0";
+        var broke = balances[0].equals(0) && balances[1].equals(0) === "0";
         if ( !broke || showZero) {
           onTokenFound(balances[0], balances[1], token);
         }
@@ -298,6 +338,10 @@ function fetchTokenBalance(token, account) {
 
 function waitAndStart(time) {
     setTimeout(App.start, time);
+}
+
+function handleDonate() {
+    App.page.donateModal.css("display", "block");
 }
 
 // Inital loading of the page
