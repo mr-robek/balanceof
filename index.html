@@ -1,0 +1,133 @@
+
+<html>
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-110185308-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-110185308-1');
+    </script>
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta name="description" content="Your etherdelta tokens balance in one place. Trade or Withdraw - you decide!" />
+    <meta name="keywords" content="dapp, etherdelta, balance, token, erc20, web3, metamask" />
+    <meta name="author" content="balanceof">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow" />
+    <meta name="revisit-after" content="1 days">
+    <meta property="og:title" content="balanceof.me" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://balanceof.me" />
+    <meta property="og:description" content="Your etherdelta tokens balance in one place. Trade or Withdraw - you decide!" />
+    <title>
+        balanceof.me
+    </title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="./css/normalize.css">
+    <link rel="stylesheet" href="./css/milligram.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <nav class="bar">
+        <section class="container">
+            <a href="http://balanceof.me/"><h1 class="title">balanceof.me</h1></a>
+            <ul class="navigation-list right">
+                <!-- <li class="navigation-item"><a class="navigation-link" href="#" data-popover="">WETH</a></li>
+                <li class="navigation-item"><a class="navigation-link" href="#" data-popover="">Donate</a></li> -->
+            </ul>
+        </section>
+    </nav>
+    <section class="container main">
+      <h1 style="text-align: center; margin: 5px 0px;">Etherdelta Tokens Balance</h1>
+        <div class="flex-display">
+          <div class="flex-one" style="padding-right: 10px;">
+            <p>Scan EtherDelta exchange smartcontract and find out which of your tokens are still there.</p>
+            <p>The "Withdraw" function will let you easly clean your balance. No more dust left behind!</p>
+            <p>Remember to install and unlock MetaMask plugin in your browser.</p>
+          </div>
+          <div class="flex-one" style="padding-left: 10px;">
+            <div class="flex-display">
+              <label for="tickersInput" class="flex-one">Enter the ticker name: </label>
+              <input id="tickersInput" class="flex-two ticker-input">
+            </div>
+            <div class="selected-container"></div>
+            <div class="flex-display">
+              <button id="scan-selected" class="button button-outline flex-one" style="margin-top: 10px">Scan selected tokens!</button>
+              <span style="margin:15px; font-weight: bold;">or</span>
+              <button id="scan-all" class="button button-outline flex-one" style="margin-top: 10px">Do a Full Scan Now!</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="right">Tokens balance scanning progress: <span id="current">0</span>/<span id="total">0</span></p>
+        <table>
+            <thead>
+                <th>Token</th>
+                <th>Total</th>
+                <th>Wallet</th>
+                <th>EtherDelta</th>
+                <th></th>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div class="info-wrapper" />
+    </section>
+    <footer class="bar">
+        <section class="container">
+            <p style="margin: 0;">Created by <a href="https://twitter.com/MR_R0BEK" title="MrR" target="_blank">MrR</a></p>
+        </section>
+    </footer>
+
+    <div id="withdrawModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close" onclick="App.closeAllModals()">&times;</span>
+        <h3> Withdraw </h3>
+        <hr />
+        <div class="move-tokens">
+          <input type="number" value="0"></input><span>max</span><button class="button button-outline">withdraw</button>
+          <input type="range" min="1" max="100" value="0" class="slider" id="balanceRange"></input>
+        </div>
+      </div>
+    </div>
+
+    <div id="depositModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close" onclick="App.closeAllModals()">&times;</span>
+        <h3> Deposit </h3>
+        <hr />
+        <div class="move-tokens">
+          <input type="number" value="0"></input><span>max</span><button class="button button-outline">deposit</button>
+          <input type="range" min="1" max="100" value="0" class="slider" id="balanceRange"></input>
+        </div>
+      </div>
+    </div>
+
+    <div id="transferModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close" onclick="App.closeAllModals()">&times;</span>
+        <h3> Transfer </h3>
+        <hr />
+        <div class="move-tokens">
+          <input type="text" placeholder="0x...."></input>
+          <input type="number" value="0"></input><span>max</span><button class="button button-outline">transfer</button>
+          <input type="range" min="1" max="100" value="0" class="slider" id="balanceRange"></input>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="./js/bignumber.min.js"></script>
+    <script src="./js/web3.min.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+
+</html>

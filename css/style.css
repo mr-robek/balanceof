@@ -1,0 +1,278 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+.main {
+    flex: 1;
+    padding: 15px;
+}
+.info-wrapper {
+    position: fixed;
+    right: 1px;
+    top: 1px;
+    width: 300px;
+    font-size: 14px;
+    font-weight: bold;
+}
+.info-wrapper span {
+    font-weight: bold;
+    cursor: pointer;
+}
+.info-wrapper div {
+    border: 1px solid #9b4dca;
+    background-color: white;
+    margin: 1px 1px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+}
+.info-wrapper hr {
+    margin: 5px;
+}
+.info-wrapper .info-error {
+    border: 1px inset #FA4603;
+}
+.info-error hr {
+    border-color: #FA460344;
+}
+.info-error span {
+    color: #FA460388;
+}
+.bar {
+    background-color: #f4f5f6;
+}
+nav {
+    border-bottom: 1px solid #d1d1d1;
+    height: 52px;
+}
+footer {
+    width: 100%;
+    border-top: 1px solid #d1d1d1;
+    line-height: 50px;
+    text-align: center;
+    height: 52px;
+}
+.navigation-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.navigation-item {
+    float: left;
+}
+.navigation-link {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+}
+nav .title {
+    display: inline;
+    color: #606c76;
+    font-size: 2.2rem;
+    line-height: 5.2rem;
+    padding: 0;
+    text-decoration: none;
+}
+.right {
+    float: right;
+}
+
+.flex-display {
+  display: flex;
+}
+
+.flex-one {
+  flex: 1;
+}
+
+.flex-two {
+  flex: 2;
+}
+
+.ticker-input {
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.selected-container {
+  background-color: white;
+  /*border: 1px solid #d1d1d1;*/
+  /*border-radius: 4px;*/
+  min-height: 40px;
+  /*padding: 5px;*/
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.selected-ticker {
+  background-color: #f4f5f6;
+  padding: 0px 4px;
+  border-radius: 4px;
+  border: 1px solid #d1d1d1;
+  font-weight: normal;
+  margin: 2px;
+  height: 27px;
+}
+.remove-ticker {
+  padding-left: 5px;
+  border-left: 1px solid #d1d1d1;
+  margin-left: 5px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  font-size: 75%;
+}
+th, td {
+  text-align: center;
+}
+td:first-child, th:first-child {
+  width: 80px;
+}
+
+td {
+  width: 200px;
+}
+
+td:last-child {
+  width: 150px
+}
+
+/* input element for the deposit / tranfer/ withdraw */
+.move-tokens {
+  width: 600px;
+}
+.move-tokens > input[type="number"] {
+  padding-right:250px;
+}
+.move-tokens > span {
+  margin-left: -180px;
+  padding: 9px;
+  background-color: whitesmoke;
+  cursor: pointer;
+}
+
+.move-tokens > button {
+  width: 131px;
+  border-radius: 0 0.4rem 0.4rem 0;
+}
+
+/* turning off the up/down arrows on input type number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* slider for deposit/withdraw/transfer */
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #9b4dca;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #9b4dca;
+    cursor: pointer;
+}
+
+/* modal */
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 650px; 
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.dropdown {
+  display: inline-block;
+}
+.dropdown:hover {
+  background-color: whitesmoke;
+}
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+.dropdown button {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 0px;
+  border: 0px;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+  display: block;
+  border: none;
+  border-radius: 0px;
+  margin-bottom: 0px;
+}
+.dropdown-content hr {
+  margin: 0px;
+  border-color: #d1d1d1;
+}
+.dropdown-content a.button:hover {
+  background-color: whitesmoke;
+}
