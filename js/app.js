@@ -63,30 +63,33 @@ function isEth(addr) {
 }
 
 async function withdraw(bn, token) {
-  if (!App.edcontract) {
-    App.edcontract = await initContract('edabi', ED_ADDRESS);
-  }
-  var txParam = {
-    value: 0,
-    gasPrice: web3.toWei(20, "gwei"),
-    gas: 250000,
-    from: web3.eth.accounts[0]
-  }
-  var fn = (err, txHash) => {
-    if(err) {
-      onError(`Withdraw all ${token.name} failed.`);
-      return;
+    if (!App.edcontract) {
+        App.edcontract = await initContract('edabi', ED_ADDRESS);
     }
-    var url = `https://etherscan.io/tx/${txHash}`
-    createAlert("info", `Withdraw all ${token.name} submitted. Watch the tx on <a href="${url}" title=${url} target="_blank">etherscan.io</a>.`);
-    console.log(`Submitted: ${url}`);
-  };
-  if (isEth(token.addr)) {
-    App.edcontract.withdraw(bn, txParam, fn);
-  } else {
-    App.edcontract.withdrawToken(token.addr, bn,txParam, fn);
-  }
-
+    var txParam = {
+        value: 0,
+        gasPrice: web3.toWei(20, "gwei"),
+        gas: 250000,
+        from: web3.eth.accounts[0]
+    }
+    return new Promsie( (resolve, reject) => {
+        var fn = (err, txHash) => {
+            if(err) {
+                onError(`Withdraw ${token.name} failed.`);
+                reject(`Withdraw ${token.name} failed.`);
+                return;
+            }
+            var url = `https://etherscan.io/tx/${txHash}`
+            createAlert("info", `Withdraw all ${token.name} submitted. Watch the tx on <a href="${url}" title=${url} target="_blank">etherscan.io</a>.`);
+            console.log(`Submitted: ${url}`);
+            resolve(`Submitted: ${url}`);
+        };
+        if (isEth(token.addr)) {
+            App.edcontract.withdraw(bn.toString(10), txParam, fn);
+        } else {
+            App.edcontract.withdrawToken(token.addr, bn.toString(10),txParam, fn);
+        }
+    })
 }
 
 
@@ -109,18 +112,33 @@ function formatAmount(amount, decimals){
   return amount;
 }
 
+function toBigNumber(str, decimals){
+  // prepend correct amount of zeros if the number is less then decimals
+  var full =  str.split(".")[0];
+  var fraction =  str.split(".")[1];
+  fraction = fraction.slice(0, decimals); // this should not happend but if the fraction has more digits then decimals we should discard them
+  // append the correct amount of zero to the end of fraction
+  fraction += "0".repeat(decimals-fraction.length);
+  return new BigNumber(full+fraction);
+}
+
 function fetchJson(path) {
   return new Promise((resolve, reject) => {
     $.getJSON('./js/'+path+".json").done(resolve).error(reject);
   })
 }
 
+var web3initDone=false;
 function initWeb3() {
+  if (web3initDone)
+    return Promise.resolve();
   return new Promise( (resolve, reject) => {
     if (web3 === undefined || !user()) {
       onError("Could not connect to Ethereum. Consider installing <a href='https://metamask.io/' target='_blank' title='metamask.io'>MetaMask</a>. If you are using MetaMask, you may need to unlock your account. Please reload this page and try again.");
       return reject();
     }
+    web3 = new Web3(web3.currentProvider);
+    web3initDone = true;
     return resolve();
   })
 }
@@ -198,10 +216,34 @@ var App = {
   },
 
   showDepositModal(available, token) {
-    this.resetAndShowModal(App.page.depositModal, available, token);
+    var modal = App.page.depositModal;
+    modal.find("button").off("click").on("click", ev => {
+      ev.preventDefault;
+      var amount = toBigNumber(modal.find("input#amountInput").val());
+      if (amount.greaterThan(available)) {
+          // show a warning message
+      }
+      deposit(amount, token)
+      .then(() => {
+          App.closeAllModals();
+      });
+    })
+    this.resetAndShowModal(App.page.modal, available, token);
   },
 
   showTransferModal(available, token) {
+    var modal = App.page.transferModal;
+    modal.find("button").off("click").on("click", ev => {
+      ev.preventDefault;
+      var amount = toBigNumber(modal.find("input#amountInput").val());
+      if (amount.greaterThan(available)) {
+        // show a warning message
+      }
+      transfer(amount, token)
+      .then(() => {
+        App.closeAllModals();
+      });
+    })
     this.resetAndShowModal(App.page.transferModal, available, token);
   },
 
@@ -209,7 +251,15 @@ var App = {
     var modal = App.page.withdrawModal;
     modal.find("button").off("click").on("click", ev => {
         ev.preventDefault;
-        // toBigNumber(modal.find("input#amountInput").val());
+        var amount = toBigNumber(modal.find("input#amountInput").val());
+        if (amount.greaterThan(available)) {
+            // show a warning message
+        }
+
+        withdraw(amount, token)
+        .then(() => {
+            App.closeAllModals();
+        });
     })
     this.resetAndShowModal(modal, available, token);
 
@@ -297,7 +347,7 @@ var App = {
           balances = await fetchTokenBalance(token, user());
         }
         onProgress(i+1, tokens.length);
-        var broke = balances[0].equals(0) && balances[1].equals(0) === "0";
+        var broke = balances[0].equals(0) && balances[1].equals(0);
         if ( !broke || showZero) {
           onTokenFound(balances[0], balances[1], token);
         }
