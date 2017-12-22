@@ -1,0 +1,7 @@
+// constants
+
+const GAS_LIMIT=120000;
+const JB_ADDRESS = "0x0ead7Fa41038D2a8040A74FcfBDDc079F254dc9D";
+const ED_ADDRESS = "0x8d12A197cB00D4747a1fe03395095ce2A5CC6819";
+
+// end of constants

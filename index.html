@@ -37,7 +37,7 @@
             <a href="http://balanceof.me/"><h1 class="title">balanceof.me</h1></a>
             <ul class="navigation-list right">
                 <!-- <li class="navigation-item"><a class="navigation-link" href="#" data-popover="">WETH</a></li> -->
-                <li class="navigation-item"><a class="navigation-link" href="#" data-popover="" onclick="handleDonate()">Donate</a></li>
+                <li class="navigation-item"><a class="navigation-link" href="#" data-popover="" onclick="handleDonate()">Contribute</a></li>
             </ul>
         </section>
     </nav>
@@ -89,10 +89,12 @@
         <span class="close" onclick="App.closeAllModals()">&times;</span>
         <h3> Withdraw <span id="name"></span></h3>
         <hr />
+        <p>To withdraw your funds from etherdelta, please enter the amount and press the withdraw button.</p>
         <div class="move-tokens">
           <input type="number" value="0" id="amountInput"></input><span id="max">max</span><button class="button button-outline">withdraw</button>
           <input type="range" min="0.0" max="1.0" step="0.01" value="0" class="slider" id="balanceRange"></input>
         </div>
+        <div class="error" style="height: 80px; color: red;"></div>
       </div>
     </div>
 
@@ -102,10 +104,13 @@
         <span class="close" onclick="App.closeAllModals()">&times;</span>
         <h3> Deposit <span id="name"></span></h3>
         <hr />
+        <p>Deposting ERC20 tokens requires two trasactions: one to approve etherdelta to use your tokens and one to save the amount of deposited tokens in etherdelta smartcontract.</p>
+        <p>To deposit your funds to etherdelta, please enter the amount and press the deposit button.</p>
         <div class="move-tokens">
           <input type="number" value="0" id="amountInput"></input><span id="max">max</span><button class="button button-outline">deposit</button>
           <input type="range" min="0.0" max="1.0" step="0.01" value="0" class="slider" id="balanceRange"></input>
         </div>
+        <div class="error" style="height: 80px; color: red;"></div>
       </div>
     </div>
 
@@ -115,26 +120,29 @@
         <span class="close" onclick="App.closeAllModals()">&times;</span>
         <h3> Transfer <span id="name"></span></h3>
         <hr />
+        <p>Remember that transfering to etherdelta smartcontract is not the same as making a deposit to etherdelta. Transfering funds to etherdelta might result in your funds being lost.</p>
+        <p>To transfer your funds to other user, please enter the receiving address, the amount you want to send and press the transfer button.</p><p>Tokens has to be compatible with ERC20 standard.</p>
         <div class="move-tokens">
-          <input type="text" placeholder="0x...."></input>
+          <input type="text" id="transferAddress" placeholder="0x...."></input>
           <input type="number" value="0" id="amountInput"></input><span id="max">max</span><button class="button button-outline">transfer</button>
           <input type="range" min="0.0" max="1.0" step="0.01" value="0" class="slider" id="balanceRange"></input>
         </div>
+        <div class="error" style="height: 80px; color: red;"></div>
       </div>
     </div>
     <div id="donateModal" class="modal">
       <!-- Modal content -->
       <div class="modal-content">
         <span class="close" onclick="App.closeAllModals()">&times;</span>
-        <h3> Donate</h3>
+        <h3>Contribute to a project</h3>
         <hr />
         <p>
-             If you like my work and you want to say thanks, you can do it on <a href="https://twitter.com/MR_R0BEK" title="MrR" target="_blank">Twitter</a> or you can buy me a beer by sending some ether or tokens to my account:
+             If you like my work and you want to share your ideas to make this dapp better you can reach me on <a href="https://twitter.com/MR_R0BEK" title="MrR" target="_blank">Twitter</a>. Alternatively, you can support my work by sending some ether or tokens to my account:
         </p>
         <pre><code>
             0xAf8CA985092f6f93F068CD8CcBc81E5fd0474047
         </pre></code>
-
+        <p>I will use the funds to make the UI/UX more userfriendly, upgrade the server hosting this page and add more features!</p>
         <p>
             Thanks :)<br/>
             Robert
