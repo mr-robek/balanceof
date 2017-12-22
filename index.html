@@ -42,7 +42,7 @@
         </section>
     </nav>
     <section class="container main">
-      <h1 style="text-align: center; margin: 5px 0px;">Etherdelta Tokens Balance</h1>
+      <h1 style="text-align: center; margin-top: 10px; margin-bottom: 30px">Etherdelta Tokens Balance</h1>
         <div class="flex-display">
           <div class="flex-one" style="padding-right: 10px;">
             <p>Scan EtherDelta exchange smartcontract and find out which of your tokens are still there.</p>
@@ -105,7 +105,7 @@
         <h3> Deposit <span id="name"></span></h3>
         <hr />
         <p>Deposting ERC20 tokens requires two trasactions: one to approve etherdelta to use your tokens and one to save the amount of deposited tokens in etherdelta smartcontract.</p>
-        <p>To deposit your funds to etherdelta, please enter the amount and press the deposit button.</p>
+        <p>To deposit your funds from your wallet to etherdelta, please enter the amount and press the deposit button.</p>
         <div class="move-tokens">
           <input type="number" value="0" id="amountInput"></input><span id="max">max</span><button class="button button-outline">deposit</button>
           <input type="range" min="0.0" max="1.0" step="0.01" value="0" class="slider" id="balanceRange"></input>
@@ -121,7 +121,7 @@
         <h3> Transfer <span id="name"></span></h3>
         <hr />
         <p>Remember that transfering to etherdelta smartcontract is not the same as making a deposit to etherdelta. Transfering funds to etherdelta might result in your funds being lost.</p>
-        <p>To transfer your funds to other user, please enter the receiving address, the amount you want to send and press the transfer button.</p><p>Tokens has to be compatible with ERC20 standard.</p>
+        <p>To transfer your funds from your wallet to other user, please enter the receiving address, the amount you want to send and press the transfer button.</p><p>Tokens has to be compatible with ERC20 standard.</p>
         <div class="move-tokens">
           <input type="text" id="transferAddress" placeholder="0x...."></input>
           <input type="number" value="0" id="amountInput"></input><span id="max">max</span><button class="button button-outline">transfer</button>
