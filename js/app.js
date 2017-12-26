@@ -360,7 +360,7 @@ var App = {
       App.jbcontract = await initContract('jbabi', JB_ADDRESS);
     }
     $("table tbody").empty();
-    this.disableScanButtons();
+    App.disableScanButtons();
     onProgress(0, tokens.length);
     for (var i = 0; i < tokens.length; i++) {
       try {
@@ -382,7 +382,7 @@ var App = {
         onError("Error fetching " + escape(tokens[i].name) + " balance.");
       }
     }
-    this.enableScanButtons();
+    App.enableScanButtons();
   }
 }
 
