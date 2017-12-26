@@ -47,12 +47,16 @@ nav {
     border-bottom: 1px solid #d1d1d1;
     height: 52px;
 }
+nav .logo {
+  height: 40px;
+  margin-top: 8px;
+}
 footer {
     width: 100%;
     border-top: 1px solid #d1d1d1;
     line-height: 50px;
     text-align: center;
-    height: 52px;
+    /*height: 52px;*/
 }
 .navigation-list {
     list-style-type: none;
