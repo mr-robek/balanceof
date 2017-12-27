@@ -106,7 +106,7 @@ function initWeb3() {
   if (web3initDone)
     return Promise.resolve();
   return new Promise( (resolve, reject) => {
-    if (web3 === undefined || !user()) {
+    if (typeof web3 === "undefined" || web3 === undefined || !user()) {
       onError("Could not connect to Ethereum. Consider installing <a href='https://metamask.io/' target='_blank' title='metamask.io'>MetaMask</a>. If you are using MetaMask, you may need to unlock your account. Please reload this page and try again.");
       return reject();
     }
