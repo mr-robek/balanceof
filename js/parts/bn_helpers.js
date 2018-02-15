@@ -25,3 +25,16 @@ function toBigNumber(str, decimals){
 }
 
 // end of bignumber.js helpers
+
+// helpers.js
+
+function getTicker(addr) {
+  var tokens = Object.values(App.tokens);
+  var filtered = tokens.filter( token => token.addr == addr)
+  return filtered.length ? filtered[0].name : addr;
+}
+
+function getAddres(ticker) {
+  return App.tokens(ticker);
+}
+// end of helpers.js

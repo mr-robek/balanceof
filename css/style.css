@@ -159,11 +159,12 @@ th, td {
 td:first-child, th:first-child {
   width: 80px;
 }
-
+tbody tr:nth-child(odd) {
+  background-color: whitesmoke;
+}
 td {
   width: 200px;
 }
-
 td:last-child {
   width: 150px
 }

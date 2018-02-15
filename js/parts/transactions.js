@@ -1,5 +1,33 @@
 // Metamask triggers
 
+var web3initDone=false;
+function initWeb3() {
+  if (web3initDone)
+    return Promise.resolve();
+  return new Promise( (resolve, reject) => {
+    if (typeof web3 === "undefined" || web3 === undefined || !user()) {
+      onError("Could not connect to Ethereum. Consider installing <a href='https://metamask.io/' target='_blank' title='metamask.io'>MetaMask</a>. If you are using MetaMask, you may need to unlock your account. Please reload this page and try again.");
+      return reject();
+    }
+    web3 = new Web3(web3.currentProvider);
+    web3initDone = true;
+    return resolve();
+  })
+}
+
+var tokenabi;
+async function initTokenContract(name, address) {
+  await initWeb3();
+  var abi = tokenabi || await fetchJson(name);
+  return web3.eth.contract(abi).at(address);
+}
+async function initContract(name, address) {
+  await initWeb3();
+  var abi = await fetchJson(name);
+  return web3.eth.contract(abi).at(address.toLowerCase());
+}
+
+
 function TxParam() {
   return {
     value: 0,

@@ -25,6 +25,19 @@ function toBigNumber(str, decimals){
 }
 
 // end of bignumber.js helpers
+
+// helpers.js
+
+function getTicker(addr) {
+  var tokens = Object.values(App.tokens);
+  var filtered = tokens.filter( token => token.addr == addr)
+  return filtered.length ? filtered[0].name : addr;
+}
+
+function getAddres(ticker) {
+  return App.tokens(ticker);
+}
+// end of helpers.js
 // constants
 
 const GAS_LIMIT=120000;
@@ -32,6 +45,64 @@ const JB_ADDRESS = "0x0ead7Fa41038D2a8040A74FcfBDDc079F254dc9D";
 const ED_ADDRESS = "0x8d12A197cB00D4747a1fe03395095ce2A5CC6819";
 
 // end of constants
+// Begin of prices.js
+
+class Prices {
+  constructor() {
+    this.prices = {};
+    this.listeners = {};
+  }
+
+  on(addr, callback) {
+    this.listeners[addr] = callback;
+  }
+
+  trigger(addr, price) {
+    var fn = this.listeners[addr];
+    if (fn) {
+      fn(price);
+    }
+  }
+  get(addr) {
+    return this.prices[addr];
+  }
+  async start() {
+    if (!App.edcontract) {
+        App.edcontract = await initContract('edabi', ED_ADDRESS);
+    }
+
+    this.tradeWatch = App.edcontract.Trade({fromBlock: 4810000}, (err, ev) => {
+      var args = ev.args;
+      // discover which one is ether and which one is token
+      var side_a = { addr: args.tokenGet, amount: args.amountGet }
+      var side_b = { addr: args.tokenGive, amount: args.amountGive }
+      var ether = side_a, token = side_b;
+      if (!isEth(side_a.addr)) {
+        ether = side_b;
+        token = side_a;
+      }
+      // sometime there are trades that are not officialy listed
+      if (getTicker(token.addr) == token.addr) {
+        console.log("untracked token trade:", token);
+        return;
+      }
+      // because tokens have different deciamal precision we need to unify it and have to amount in normal readable format
+      var decimals = App.tokens[getTicker(token.addr)].decimals;
+      var tamount = new BigNumber(formatAmount(token.amount.toString(10), decimals));
+      var eamount = new BigNumber(formatAmount(ether.amount.toString(10), 18));
+      // now the price should be correct
+      var price = eamount.dividedBy(tamount).round(10);
+      console.log(`Trade event: ${tamount.toString(10)} ${getTicker(token.addr)} for ${eamount.toString(10)} ETH - price: ${price.toString(10)}`)
+      this.prices[token.addr] = price;
+      this.trigger(token.addr, price);
+    })
+  }
+  stop() {
+    this.tradeWatch.stopWatching()
+  }
+}
+
+// End of prices.js
 // end of rest of the app.js
 function onError(text) {
     createAlert("error", text);
@@ -63,11 +134,35 @@ function getRowMenu(wallet, etherdelta, token) {
   return `<div class="dropdown"><button class="button button-outline"> &plus; </button>${createDropdownContent(wallet, etherdelta, token)}</div>`;
 }
 
+function getLastPrice(token) {
+  var price = App.prices.get(token.addr);
+  if (!price)
+    return "N/A"
+  return price.round(10).toString(10);
+}
+
+function getTotalEthValue(token, total) {
+  var price = isEth(token.addr) ? new BigNumber(1) : App.prices.get(token.addr);
+  if (!price)
+    return "N/A";
+  var rounded=new BigNumber(formatAmount(price.times(total).floor().toString(10), token.decimals)).round(8);
+  return rounded.toString(10);
+}
+
 function getTableRow(wallet, etherdelta, token) {
-  var total = formatAmount(wallet.add(etherdelta).toString(10), token.decimals);
+  var total = wallet.add(etherdelta);
+  var totalString = formatAmount(total.toString(10), token.decimals);
   var walletbalance = formatAmount(wallet.toString(10), token.decimals);
   var edbalance = formatAmount(etherdelta.toString(10), token.decimals);
-  return `<tr><td>${getEtherdeltaTradeAnchor(token)}</td><td>${escape(total)}</td><td>${escape(walletbalance)}</td><td>${escape(edbalance)}</td><td>${getRowMenu(wallet, etherdelta, token)}</td></tr>`;
+  var tokenTradeTd = `<td>${getEtherdeltaTradeAnchor(token)}</td>`;
+  var totalTd = `<td>${escape(totalString)}</td>`;
+  var walletTd = `<td>${escape(walletbalance)}</td>`;
+  var edbalanceTd = `<td>${escape(edbalance)}</td>`;
+  var menuTd = `<td>${getRowMenu(wallet, etherdelta, token)}</td>`;
+  var lastPriceTd = `<td id="lastprice-${token.addr}">${getLastPrice(token)}</td>`;
+  var ethvalueTd = `<td id="ethvalue-${token.addr}">${getTotalEthValue(token, total)}</td>`
+  // return `<tr>${tokenTradeTd}${walletTd}${edbalanceTd}${totalTd}${lastPriceTd}${ethvalueTd}${menuTd}</tr>`;
+  return `<tr>${tokenTradeTd}${walletTd}${edbalanceTd}${totalTd}${menuTd}</tr>`;
 }
 function onProgress(current, total) {
   $("span#current").text(current);
@@ -77,15 +172,19 @@ function onProgress(current, total) {
 function onTokenFound(wallet, etherdelta, token) {
   var markup = getTableRow(wallet, etherdelta, token);
   $("table tbody").append(markup);
-  $("table tbody").on("click", `#deposit-${token.addr}`, (ev) => {
+  App.prices.on(token.addr, price => {
+    $(`td#lastprice-${token.addr}`).text(getLastPrice(token));
+    $(`td#ethvalue-${token.addr}`).text(getTotalEthValue(token, wallet.add(etherdelta)));
+  });
+  $("table tbody").off("click", `#deposit-${token.addr}`).on("click", `#deposit-${token.addr}`, (ev) => {
       ev.preventDefault();
       wallet.greaterThan(0) && App.showDepositModal(wallet, token);
   });
-  $("table tbody").on("click", `#withdraw-${token.addr}`, (ev) => {
+  $("table tbody").off("click", `#withdraw-${token.addr}`).on("click", `#withdraw-${token.addr}`, (ev) => {
       ev.preventDefault();
       etherdelta.greaterThan(0) && App.showWithdrawModal(etherdelta, token);
   })
-  $("table tbody").on("click", `#transfer-${token.addr}`, (ev) => {
+  $("table tbody").off("click", `#transfer-${token.addr}`).on("click", `#transfer-${token.addr}`, (ev) => {
       ev.preventDefault();
       wallet.greaterThan(0) && App.showTransferModal(wallet, token);
   })
@@ -99,33 +198,6 @@ function fetchJson(path) {
   return new Promise((resolve, reject) => {
     $.getJSON('./js/'+path+".json").done(resolve).error(reject);
   })
-}
-
-var web3initDone=false;
-function initWeb3() {
-  if (web3initDone)
-    return Promise.resolve();
-  return new Promise( (resolve, reject) => {
-    if (typeof web3 === "undefined" || web3 === undefined || !user()) {
-      onError("Could not connect to Ethereum. Consider installing <a href='https://metamask.io/' target='_blank' title='metamask.io'>MetaMask</a>. If you are using MetaMask, you may need to unlock your account. Please reload this page and try again.");
-      return reject();
-    }
-    web3 = new Web3(web3.currentProvider);
-    web3initDone = true;
-    return resolve();
-  })
-}
-
-var tokenabi;
-async function initTokenContract(name, address) {
-  await initWeb3();
-  var abi = tokenabi || await fetchJson(name);
-  return web3.eth.contract(abi).at(address);
-}
-async function initContract(name, address) {
-  await initWeb3();
-  var abi = await fetchJson(name);
-  return web3.eth.contract(abi).at(address);
 }
 
 function split( val ) {
@@ -161,6 +233,8 @@ var App = {
     App.initScanSelectedBtn();
     App.initScanAllBtn();
     App.initModal(); // TODO: ?
+    App.prices = new Prices();
+    // App.prices.start();
   },
   findUiElements: () => {
     App.page = {
@@ -266,8 +340,8 @@ var App = {
     modal.find("div.error").text("");
   },
 
-  showErrorOnModal(modal, msg) {
-    modal.find("div.error").text(msg);
+  showErrorOnModal(modal, err) {
+    modal.find("div.error").text(err.msg || err);
   },
 
   getAmountFromModal(modal, token) {
@@ -407,6 +481,34 @@ if (document.readyState !== 'complete') {
 }
 // end of rest of the app.js
 // Metamask triggers
+
+var web3initDone=false;
+function initWeb3() {
+  if (web3initDone)
+    return Promise.resolve();
+  return new Promise( (resolve, reject) => {
+    if (typeof web3 === "undefined" || web3 === undefined || !user()) {
+      onError("Could not connect to Ethereum. Consider installing <a href='https://metamask.io/' target='_blank' title='metamask.io'>MetaMask</a>. If you are using MetaMask, you may need to unlock your account. Please reload this page and try again.");
+      return reject();
+    }
+    web3 = new Web3(web3.currentProvider);
+    web3initDone = true;
+    return resolve();
+  })
+}
+
+var tokenabi;
+async function initTokenContract(name, address) {
+  await initWeb3();
+  var abi = tokenabi || await fetchJson(name);
+  return web3.eth.contract(abi).at(address);
+}
+async function initContract(name, address) {
+  await initWeb3();
+  var abi = await fetchJson(name);
+  return web3.eth.contract(abi).at(address.toLowerCase());
+}
+
 
 function TxParam() {
   return {

@@ -29,11 +29,35 @@ function getRowMenu(wallet, etherdelta, token) {
   return `<div class="dropdown"><button class="button button-outline"> &plus; </button>${createDropdownContent(wallet, etherdelta, token)}</div>`;
 }
 
+function getLastPrice(token) {
+  var price = App.prices.get(token.addr);
+  if (!price)
+    return "N/A"
+  return price.round(10).toString(10);
+}
+
+function getTotalEthValue(token, total) {
+  var price = isEth(token.addr) ? new BigNumber(1) : App.prices.get(token.addr);
+  if (!price)
+    return "N/A";
+  var rounded=new BigNumber(formatAmount(price.times(total).floor().toString(10), token.decimals)).round(8);
+  return rounded.toString(10);
+}
+
 function getTableRow(wallet, etherdelta, token) {
-  var total = formatAmount(wallet.add(etherdelta).toString(10), token.decimals);
+  var total = wallet.add(etherdelta);
+  var totalString = formatAmount(total.toString(10), token.decimals);
   var walletbalance = formatAmount(wallet.toString(10), token.decimals);
   var edbalance = formatAmount(etherdelta.toString(10), token.decimals);
-  return `<tr><td>${getEtherdeltaTradeAnchor(token)}</td><td>${escape(total)}</td><td>${escape(walletbalance)}</td><td>${escape(edbalance)}</td><td>${getRowMenu(wallet, etherdelta, token)}</td></tr>`;
+  var tokenTradeTd = `<td>${getEtherdeltaTradeAnchor(token)}</td>`;
+  var totalTd = `<td>${escape(totalString)}</td>`;
+  var walletTd = `<td>${escape(walletbalance)}</td>`;
+  var edbalanceTd = `<td>${escape(edbalance)}</td>`;
+  var menuTd = `<td>${getRowMenu(wallet, etherdelta, token)}</td>`;
+  var lastPriceTd = `<td id="lastprice-${token.addr}">${getLastPrice(token)}</td>`;
+  var ethvalueTd = `<td id="ethvalue-${token.addr}">${getTotalEthValue(token, total)}</td>`
+  // return `<tr>${tokenTradeTd}${walletTd}${edbalanceTd}${totalTd}${lastPriceTd}${ethvalueTd}${menuTd}</tr>`;
+  return `<tr>${tokenTradeTd}${walletTd}${edbalanceTd}${totalTd}${menuTd}</tr>`;
 }
 function onProgress(current, total) {
   $("span#current").text(current);
@@ -43,15 +67,19 @@ function onProgress(current, total) {
 function onTokenFound(wallet, etherdelta, token) {
   var markup = getTableRow(wallet, etherdelta, token);
   $("table tbody").append(markup);
-  $("table tbody").on("click", `#deposit-${token.addr}`, (ev) => {
+  App.prices.on(token.addr, price => {
+    $(`td#lastprice-${token.addr}`).text(getLastPrice(token));
+    $(`td#ethvalue-${token.addr}`).text(getTotalEthValue(token, wallet.add(etherdelta)));
+  });
+  $("table tbody").off("click", `#deposit-${token.addr}`).on("click", `#deposit-${token.addr}`, (ev) => {
       ev.preventDefault();
       wallet.greaterThan(0) && App.showDepositModal(wallet, token);
   });
-  $("table tbody").on("click", `#withdraw-${token.addr}`, (ev) => {
+  $("table tbody").off("click", `#withdraw-${token.addr}`).on("click", `#withdraw-${token.addr}`, (ev) => {
       ev.preventDefault();
       etherdelta.greaterThan(0) && App.showWithdrawModal(etherdelta, token);
   })
-  $("table tbody").on("click", `#transfer-${token.addr}`, (ev) => {
+  $("table tbody").off("click", `#transfer-${token.addr}`).on("click", `#transfer-${token.addr}`, (ev) => {
       ev.preventDefault();
       wallet.greaterThan(0) && App.showTransferModal(wallet, token);
   })
@@ -65,33 +93,6 @@ function fetchJson(path) {
   return new Promise((resolve, reject) => {
     $.getJSON('./js/'+path+".json").done(resolve).error(reject);
   })
-}
-
-var web3initDone=false;
-function initWeb3() {
-  if (web3initDone)
-    return Promise.resolve();
-  return new Promise( (resolve, reject) => {
-    if (typeof web3 === "undefined" || web3 === undefined || !user()) {
-      onError("Could not connect to Ethereum. Consider installing <a href='https://metamask.io/' target='_blank' title='metamask.io'>MetaMask</a>. If you are using MetaMask, you may need to unlock your account. Please reload this page and try again.");
-      return reject();
-    }
-    web3 = new Web3(web3.currentProvider);
-    web3initDone = true;
-    return resolve();
-  })
-}
-
-var tokenabi;
-async function initTokenContract(name, address) {
-  await initWeb3();
-  var abi = tokenabi || await fetchJson(name);
-  return web3.eth.contract(abi).at(address);
-}
-async function initContract(name, address) {
-  await initWeb3();
-  var abi = await fetchJson(name);
-  return web3.eth.contract(abi).at(address);
 }
 
 function split( val ) {
@@ -127,6 +128,8 @@ var App = {
     App.initScanSelectedBtn();
     App.initScanAllBtn();
     App.initModal(); // TODO: ?
+    App.prices = new Prices();
+    // App.prices.start();
   },
   findUiElements: () => {
     App.page = {
@@ -232,8 +235,8 @@ var App = {
     modal.find("div.error").text("");
   },
 
-  showErrorOnModal(modal, msg) {
-    modal.find("div.error").text(msg);
+  showErrorOnModal(modal, err) {
+    modal.find("div.error").text(err.msg || err);
   },
 
   getAmountFromModal(modal, token) {
