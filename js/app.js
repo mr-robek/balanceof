@@ -121,7 +121,7 @@ function createAlert(type, content) {
 function getEtherdeltaTradeAnchor(token) {
     if (isEth(token.addr))
         return "ETH";
-    return `<a href='https://etherdelta.com/#${token.name}-ETH' title="https://etherdelta.com/#${token.name}-ETH" target="_blank">${token.name}</a>`;
+    return `<a href='https://etherdelta.com/#${token.path}' title="https://etherdelta.com/#${token.path}" target="_blank">${token.name}</a>`;
 }
 
 function createDropdownLink(title, amount, token) {
@@ -162,7 +162,7 @@ function getTableRow(wallet, etherdelta, token) {
   var lastPriceTd = `<td id="lastprice-${token.addr}">${getLastPrice(token)}</td>`;
   var ethvalueTd = `<td id="ethvalue-${token.addr}">${getTotalEthValue(token, total)}</td>`
   // return `<tr>${tokenTradeTd}${walletTd}${edbalanceTd}${totalTd}${lastPriceTd}${ethvalueTd}${menuTd}</tr>`;
-  return `<tr>${tokenTradeTd}${walletTd}${edbalanceTd}${totalTd}${menuTd}</tr>`;
+  return `<tr>${tokenTradeTd}${totalTd}${walletTd}${edbalanceTd}${menuTd}</tr>`;
 }
 function onProgress(current, total) {
   $("span#current").text(current);

@@ -1,0 +1,19 @@
+[
+  {"addr":"0x1a7a8bd9106f2b8d977e08582dc7d24c723ab0db","name":"APPC","decimals":18},
+  {"addr":"0x3136ef851592acf49ca4c825131e364170fa32b3","name":"COFI","decimals":18},
+  {"addr":"0x923108a439c4e8c2315c4f6521e5ce95b44e9b4c","name":"EVE","decimals":18},
+  {"addr":"0xec46f8207d766012454c408de210bcbc2243e71c","name":"NOX","decimals":18},
+  {"addr":"0x6745fab6801e376cd24f03572b9c9b0d4edddccf","name":"SENSE","decimals":8},
+  {"addr":"0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca","name":"ST","decimals":18},
+  {"addr":"0xae73b38d1c9a8b274127ec30160a4927c4d71824","name":"STK","decimals":18},
+  {"addr":"0xd0a4b8946cb52f0661273bfbc6fd0e0c75fc6433","name":"STORM","decimals":18},
+  {"addr":"0xaa7a9ca87d3694b5755f213b5d04094b8d0f0a6f","name":"TRAC","decimals":18},
+  {"addr":"0xC399D1E21AC4c6B65551C4ECF8D6EF4C4316E383","name":"AMR","decimals":16},
+  {"addr":"0x076C97e1c869072eE22f8c91978C99B4bcB02591","name":"CBT","decimals":18},
+  {"addr":"0x408e41876cccdc0f92210600ef50372656052a38","name":"REN","decimals":18},
+  {"addr":"0x3883f5e181fccaf8410fa61e12b59bad963fb645","name":"THETA","decimals":18},
+  {"addr":"0x5d65d971895edc438f465c17db6992698a52318d","name":"NAS","decimals":18},
+  {"addr":"0x618e75ac90b12c6049ba3b27f5d5f8651b0037f6","name":"QASH","decimals":6},
+  {"addr":"0x3833dda0aeb6947b98ce454d89366cba8cc55528","name":"SPHTX","decimals":18},
+  {"addr":"0x9af2c6b1a28d3d6bc084bd267f70e90d49741d5b","name":"AXP","decimals":8}
+]

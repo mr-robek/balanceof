@@ -1,0 +1,14 @@
+{
+  "name": "edtokens",
+  "version": "1.0.0",
+  "description": "fetching tokens supported by etherdelta",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "https://github.com/mr-robek/",
+  "license": "ISC",
+  "dependencies": {
+    "cloudscraper": "^1.4.1"
+  }
+}
